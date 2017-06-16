@@ -19,6 +19,7 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
 <link rel="import" href="../bower_components/app-route/app-route.html">
 <link rel="import" href="../bower_components/iron-pages/iron-pages.html">
 <link rel="import" href="../bower_components/iron-selector/iron-selector.html">
+<link rel="import" href="../bower_components/iron-ajax/iron-ajax.html">
 <link rel="import" href="../bower_components/paper-icon-button/paper-icon-button.html">
 <link rel="import" href="my-icons.html">
 
@@ -68,6 +69,13 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
       }
     </style>
 
+    <iron-ajax
+       auto
+       url="https://cdn.contentful.com/spaces/zv8ddywjecu1/entries?access_token=3bbe832331a34ae42bd9e85c70f6aa857958d2d97deade428b3eece1c16d27ba"
+       handle-as="json"
+       on-response="handleResponse"
+       last-reponse="reponse"></iron-ajax>
+
     <app-location route="{{route}}"></app-location>
     <app-route
         route="{{route}}"
@@ -92,15 +100,24 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
         <app-header slot="header" condenses reveals effects="waterfall">
           <app-toolbar>
             <paper-icon-button icon="my-icons:menu" drawer-toggle></paper-icon-button>
-            <div main-title>Testing Polymer 2.0</div>
+            <div main-title>Progressive Blog</div>
           </app-toolbar>
         </app-header>
+
+            <template is="dom-repeat" items="{{articles}}">
+              <div>
+                <a href="/[[item.sys.id]]">
+                  <h4>[[item.fields.title]]</h4>
+                </a>
+              </div>
+            </template>
 
         <iron-pages
             selected="[[page]]"
             attr-for-selected="name"
             fallback-selection="view404"
             role="main">
+
           <my-view1 name="view1"></my-view1>
           <my-view2 name="view2"></my-view2>
           <my-view3 name="view3"></my-view3>
@@ -125,6 +142,9 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
           rootPattern: String,
           routeData: Object,
           subroute: String,
+          response: {
+            type: Object
+          }
         };
       }
 
@@ -140,6 +160,11 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
         // Get root pattern for app-route, for more info about `rootPath` see:
         // https://www.polymer-project.org/2.0/docs/upgrade#urls-in-templates
         this.rootPattern = (new URL(this.rootPath)).pathname;
+      }
+
+      handleResponse(event){
+        console.log(event.detail.response);
+        this.set('articles', event.detail.response.items);
       }
 
       _routePageChanged(page) {
