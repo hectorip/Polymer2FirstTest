@@ -100,13 +100,13 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
         <app-header slot="header" condenses reveals effects="waterfall">
           <app-toolbar>
             <paper-icon-button icon="my-icons:menu" drawer-toggle></paper-icon-button>
-            <div main-title>Progressive Blog</div>
+            <div main-title>Progressive Blog Experiment</div>
           </app-toolbar>
         </app-header>
 
             <template is="dom-repeat" items="{{articles}}">
               <div>
-                <a href="/[[item.sys.id]]">
+                <a href="/post-[[item.sys.id]]" on-click="setPost">
                   <h4>[[item.fields.title]]</h4>
                 </a>
               </div>
@@ -187,6 +187,16 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
       _pageChanged(page) {
         // Load page import on demand. Show 404 page if fails
         var resolvedPageUrl = this.resolveUrl('my-' + page + '.html');
+        if (page.startsWith("post-")){
+          // this.set("selected_post", );
+          Polymer.importHref(
+            this.resolveUrl("post-viewer.html"),
+            null,
+            this._showPage404.bind(this),
+            true
+          )
+          return
+        }
         Polymer.importHref(
             resolvedPageUrl,
             null,
@@ -196,6 +206,9 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
 
       _showPage404() {
         this.page = 'view404';
+      }
+      setPost(event){
+        this.set("selected_post_info", event.model.item.fields);
       }
     }
 
